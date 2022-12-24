@@ -1,5 +1,5 @@
-# esp8266_OPRA
-OctoPrint remote API pendant touch screen. An alternate touch UI for when you are at your printer but want to ensure constant control from OctoPrint. 
+# Octo Pendant
+An OctoPrint remote API pendant touch screen. An alternate touch UI for when you are at your printer but want to ensure constant control from OctoPrint. 
 
 Uses a WeMos D1 mini (esp8266) and a [2.4" Touch TFT](https://www.aliexpress.us/item/3256803259687592.html). Both are inexpensive and easy to obtain.  I also designed a simple carrier board for connecting them together without doing manual wiring although it is possible to do it that way.  I designed a case for it as well. 
 
