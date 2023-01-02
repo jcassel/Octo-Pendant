@@ -23,7 +23,7 @@ Currently there are 5 TFT display screens and 3 web configuration screens .
 - The green left pointing arrow at the top takes you back to the main screen.
 - Standard X,Y,Z Axis controls. You can also turn the motors on or off as well as the cooling fan.
 
-![AxisControlScreen](https://user-images.githubusercontent.com/12872876/209441008-9cc742f9-9f5c-40e4-8073-92307a4f583d.jpg)
+![AxisControlScreen](https://user-images.githubusercontent.com/12872876/210279438-b85f0163-0999-4176-aa71-2406425c62ab.jpg)
 
 **Temperature Control**
 - The green left pointing arrow at the top takes you back to the main screen.
