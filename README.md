@@ -29,7 +29,7 @@ Currently there are 5 TFT display screens and 3 web configuration screens .
 - The green left pointing arrow at the top takes you back to the main screen.
 - Control the temperature of the Build plate and the Extruder with ease. Select presets or use incremtal values to get it right where you want it. 
 
-![TempControlScreen](https://user-images.githubusercontent.com/12872876/210279073-0750316a-e8a0-4211-a534-7e2276865676.jpg)
+![TempControlScreen](https://user-images.githubusercontent.com/12872876/210279342-69a1678c-5e77-4a9d-8061-fddd3d94e305.jpg)
 
 **Bed Leveling Utility**
 - The green left pointing arrow at the top takes you back to the main screen.
