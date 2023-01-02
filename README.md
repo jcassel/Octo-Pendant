@@ -1,14 +1,37 @@
 # Octo Pendant
-An OctoPrint remote API pendant touch screen. An alternate touch UI for when you are at your printer but want to ensure constant control from OctoPrint. 
+![SplashMD_v1 0 0 16](https://user-images.githubusercontent.com/12872876/210280350-4bd8bed7-bccd-4132-bae1-61645655429a.png)
+An OctoPrint remote API pendant touch screen. An alternate touch UI for when you are at your printer but want to ensure constant control from OctoPrint. Plus includes some utilities to make leveling your printer a little easier.  
 
-Uses a WeMos D1 mini (esp8266) and a [2.4" Touch TFT](https://www.aliexpress.us/item/3256803259687592.html). Both are inexpensive and easy to obtain.  I also designed a simple carrier board for connecting them together without doing manual wiring although it is possible to do it that way.  I designed a case for it as well. 
+## Features:
+* Connects to Octoprint though API. 
+* Displays running Job Status. 
+* Allows control of running Job.
+  * Can start, pause/resume, and stop Loaded files.
+* Can control Axis movment.
+* Can control Tool and bed temperatures.
+* Can run mesh leveling 
+* Includes a utility for Manual bed leveling
+
 
 Currently there are 5 TFT display screens and 3 web configuration screens . 
   TFT Screens include: Main/Monitor, Axis Control, Temperature Control, Leveling Utility, and Info.
   
   Web Configuration Screens include: Configuration Settings, Uploads(File Management), and Firmware Update(OTA)
 
-*TFT Screens*
+## Parts
+
+**Required**
+* Wemos D1 Mini (4M) [Amazon](https://www.amazon.com/dp/B073CQVFLK/) or [AliExpress](https://www.aliexpress.us/item/3256803535819463.html)
+* 2.4" Touch TFT (ILI9341) Or equivolent [AliExpress](https://www.aliexpress.us/item/2251832829271342.html) or [Amazon](https://www.amazon.com/dp/B09XHRKFMM)
+* USB Cable for programing and power 
+
+
+**nice to have**
+* TFT to D1 carrier board
+* 100uf or larger Capacitor
+
+
+## TFT Screens
 
 **Main/Monitor**
 - Using the top 3 buttons you can navigate to the other 3 screens. 
@@ -47,7 +70,7 @@ This screen shows Connection details for the Pendand. Also has a reboot button a
 ![InfoScreenMD_v1 0 0 16](https://user-images.githubusercontent.com/12872876/210279866-fea4a8f1-08ca-41b5-84b9-40f68bb3620d.png)
 
 
-**Carrier Board**
+## Carrier Board
 
 ![TFT-esp8266CarrierBoard_D1](https://user-images.githubusercontent.com/12872876/209448537-5eea7489-23f2-46bc-893f-cf334df4bc69.png)
 ![TFT-esp8266CarrierBoard_Front](https://user-images.githubusercontent.com/12872876/209448540-9da112db-8b78-45a0-8c82-8d6a644b7c12.png)
