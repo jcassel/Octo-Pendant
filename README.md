@@ -144,11 +144,13 @@ Controls for doing a manual bed level as well as sending a command set to do a m
 - Pressing one of the 5 dots on the bed will send the print head to that position on your build plat for paper style leveling. Z height will be absolute zero. *(Be sure you have homed your machine prior to using this screen.)*  
 - Pressing the Running man on the left (white) will run the mesh collection process and wait. *(see web interface for settings related to mesh leveling settings)*
 - Pressing the Running man on the right (green) will run the mesh collection process and reload the current model and start it. *(see web interface for settings related to mesh leveling settings)*
+
 ![LevelMD_v1 0 0 16](https://user-images.githubusercontent.com/12872876/210279854-7ed7ca54-84ce-4db0-a5ac-ab7e248c0086.png)
 
 ***
 **Pendant Info Screen**
-This screen shows Connection details for the Pendant. Also has a reset button at the bottom. I plan on adding more here as it makes sense. 
+This screen shows Connection details for the Pendant. Also has a reset button at the bottom. I plan on adding more here as it makes sense.
+
 ![InfoScreenMD_v1 0 0 16](https://user-images.githubusercontent.com/12872876/210279866-fea4a8f1-08ca-41b5-84b9-40f68bb3620d.png)
 ***
 
@@ -158,9 +160,11 @@ I created a Carrier board for connecting the D1 mini to the 2.4" TFT(Touch) boar
 grbl files are available as part of the repo. Also boards are available from my [Tindie](https://www.tindie.com/stores/jcsgotthis/) Store along with other related items.
 
 D1 mini mounted on carrier*(Note that I have a small Cap to help stabilize power for the board. It’s not really needed.):
+
 ![TFT-esp8266CarrierBoard_D1](https://user-images.githubusercontent.com/12872876/209448537-5eea7489-23f2-46bc-893f-cf334df4bc69.png)
 
 Carrier without D1 mini:
+
 ![TFT-esp8266CarrierBoard_Back](https://user-images.githubusercontent.com/12872876/209448541-1d713a3f-cb3d-45a9-9385-324ae081ee6e.png)
 
 
