@@ -1,0 +1,110 @@
+<!DOCTYPE HTML><html><head><title>OPRAP [OTA-Update]</title>
+<link rel="stylesheet" type="text/css" href="/style.css"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"></head>
+<body>
+	<div class="grid-container">
+		<div class="header">OctoPrint Remote API Pendant: <span id="deviceInfo" >...</span></div>
+		<div class="menu">	
+			<ul class="topnav">
+			  <li><a href="/config">Configuration</a></li>
+			  <li><a href="/spiffs">File Upload</a></li>
+			  <li class="right"><a class="active" href="/update">Update Firmware</a></li>
+			</ul>
+		</div>
+		<div id="main" class="main">
+			<form method="POST" action="#" enctype="multipart/form-data" id="upload_form">
+				<input type="file" name="update" id="file">
+				<input type="submit" value="Update">
+			</form>
+			<div id="prg_wrap" style="border: 0px solid; width: 100%;">
+			   <div id="prg" style="text-shadow: 2px 2px 3px black; padding: 5px 0; display: none; border: 1px solid #008aff; background: #002180; text-align: center; color: white;"></div>
+			</div>
+		</div>
+		<div class="footer">Current Firmware version:[ <span id="firmwareV"></span> ]</div>
+		
+	</div>	
+</body>
+<script>
+	var domReady = function(callback) {
+		document.readyState === "interactive" || document.readyState === "complete" ? callback() : document.addEventListener("DOMContentLoaded", callback);		
+	};
+
+
+	var tries = 0;
+	var controllerReady = false;
+	domReady(function() {
+		var myform = document.getElementById('upload_form');
+		var filez  = document.getElementById('file');
+		GetInfo();
+		
+		myform.onsubmit = function(event) {
+			event.preventDefault();
+
+			var formData = new FormData();
+			var file     = filez.files[0];
+
+			if (!file) { return false; }
+
+			formData.append("files", file, file.name);
+
+			var xhr = new XMLHttpRequest();
+			xhr.upload.addEventListener("progress", function(evt) {
+				if (evt.lengthComputable) {
+					var per = Math.round((evt.loaded / evt.total) * 100);
+					var prg = document.getElementById('prg');
+
+					prg.innerHTML     = per + "%"
+					prg.style.width   = per + "%"
+					prg.style.display = "block"
+				}
+			}, false);
+			xhr.open('POST', location.href, true);
+
+			// Set up a handler for when the request finishes.
+			xhr.onload = function () {
+				if (xhr.status === 200) {
+					alert('Success');
+					document.getElementById('main').innerHTML = "Waiting for cotroller to reboot. Will check again in a few seconds";
+					var intervalIds = setInterval(function(){
+						var myRequest = new Request('/getDeviceName');
+						fetch(myRequest).then(function(response) {
+							console.log(response.status); // returns http response code 2xx is ok
+							if(response.ok){
+								controllerReady = true;
+								}
+						});
+						if(controllerReady){
+							setTimeout(location.reload(), 3000);
+							//location.reload();
+						}else{
+							tries++;
+							var tDots = "";
+							for(i = 0; i < tries; i++) {
+								tDots += ".";
+							}
+							document.getElementById('main').innerHTML = "Waiting for cotroller to reboot.<br/>The page will reload when ready.<br/> Rechecking in few seconds [ " + tDots + " ]";
+						}						
+					;},3000);
+				} else {
+					alert('An error occurred!');
+				}
+			};
+
+			xhr.send(formData);
+	   }
+	   
+	});
+	function GetInfo(){
+	
+		var xmlhttp = new XMLHttpRequest();
+		
+		xmlhttp.onload = function() {
+			document.getElementById("deviceInfo").innerHTML = this.responseText;
+			document.getElementById("firmwareV").innerHTML = this.responseText;
+		};
+		xmlhttp.open("GET", "/getDeviceName", true);
+		xmlhttp.send();
+	
+	}
+</script>
+</html>

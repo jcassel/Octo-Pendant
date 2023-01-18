@@ -1,0 +1,81 @@
+<!DOCTYPE HTML><html><head><title>OPRAP [SPIFFs Upload]</title>
+<link rel="stylesheet" type="text/css" href="/style.css"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"></head>
+<body>
+	<div class="grid-container">
+		<div class="header">OctoPrint Remote API Pendant: <span id="deviceInfo" >...</span></div>
+		<div class="menu">	
+			<ul class="topnav">
+			  <li><a href="/config">Configuration</a></li>
+			  <li><a class="active" href="/spiffs">File Upload</a></li>
+			  <li class="right"><a href="/update">Update Firmware</a></li>
+			</ul>
+		</div>
+		<div id="main" class="main">
+			<form method='post' enctype='multipart/form-data'><input type='file' name='name'><input class='button' type='submit' value='Upload'></form>
+			<span><table border="1" id='filelist'></table></span>
+			<h4>Status:<span id="status"></span></h4>
+		</div>
+		<div class="footer">Current Firmware version:[ <span id="firmwareV"></span> ]</div>
+		
+	</div>	
+</body>
+<script>
+	var domReady = function(callback) {
+		document.readyState === "interactive" || document.readyState === "complete" ? callback() : document.addEventListener("DOMContentLoaded", callback);		
+	};
+	
+	domReady(function() {
+		GetInfo();
+		GetFileList();
+	});
+	
+	function GetInfo(){
+	
+		var xmlhttp = new XMLHttpRequest();
+		
+		xmlhttp.onload = function() {
+			document.getElementById("deviceInfo").innerHTML = this.responseText;
+			document.getElementById("firmwareV").innerHTML = this.responseText;
+		};
+		xmlhttp.open("GET", "/getDeviceName", true);
+		xmlhttp.send();
+	}
+	
+	function GetFileList(){
+		var xmlhttp = new XMLHttpRequest();
+		
+		xmlhttp.onload = function() {
+			var files = JSON.parse(this.responseText);
+			var fList = "<tr><th>File Path</th><th>File Size</th><th></th>";
+			for(i = 0; i < files.length; i++) {
+				fList += "<tr><td>";
+				fList += "<a target='_blank' href='spiffsDL?download=" + files[i].path + "'>" + files[i].path +"</a>";
+				fList += "</td><td>"
+				fList += files[i].size;
+				fList += "</td><td>";
+				fList += "<button name='del"+i+"' id='del"+i+"' type='delbutton' onclick='deleteFile(this);' value='"+files[i].path+"' >X</button>";
+				fList += "</tr>";
+			}
+			
+			var ele = document.getElementById('filelist');
+			ele.innerHTML = fList;
+		}
+		
+		xmlhttp.open("GET", "/APIGetFileList", true);
+		xmlhttp.send();
+	}
+	
+	function deleteFile(ele){
+		var xmlhttp = new XMLHttpRequest();
+		var path = ele.value;
+		xmlhttp.onload = function() {
+			var ret = JSON.parse(this.responseText);
+			document.getElementById("status").innerHTML = ret.LastStatus;
+			GetFileList();
+		};
+		xmlhttp.open("GET", "/APIDelFile?path=" + path, true);
+		xmlhttp.send();
+	}
+</script>
+</html>
