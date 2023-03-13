@@ -46,13 +46,16 @@ void setup() {
   
   loadSettingsConfig();
   loadMQTTConfig();
-  
+
+  Serial.println("begin init pages");
   initialisePages();
+  Serial.println("end init pages");
   webServer.begin();
+  Serial.println("end webserver.begin");
   
   ESP8266webota.init(&webServer,"/update","admin",wificonfig.apPassword);
   ESP8266webota.filePathOverRide = "/ota.htm";
-
+  Serial.println("end webota");
 
   if(mqttConfig.MQTTEN){
     ReconnectMQTT.set(10000UL); //check in 10sec on startup.
@@ -60,11 +63,15 @@ void setup() {
     mqttClient.onMessage(mqttMessageReceived);
     mqttStatusInerval.set(mqttConfig.StatusIntervalSec * 1000);
   }
-
+  Serial.println("end MQTT");
   api.init(net, settingsConfig.OPURI, settingsConfig.OPPort, settingsConfig.OPAK);
+  Serial.println("end OctoprintAPI");
   tft.init();
+  Serial.println("end TFT init");
+  
   pinMode(TFT_LED, OUTPUT);
   digitalWrite(TFT_LED, HIGH);    // HIGH to Turn on; 
+  
   #ifdef _debugopra
   Serial.println("tft.init():complete");
   #endif
@@ -95,6 +102,8 @@ void setup() {
 }
 
 void loop() {
+  
+  
   CheckWifi();
   if(mqttConfig.MQTTEN){
     if(mqttStatusInerval.check()){
@@ -134,20 +143,37 @@ void loop() {
 } //end loop
 
 void doPrinterAutoConnect(){
+  #ifdef _debugopra
+    Serial.println("Check AutoConnect");
+  #endif
+  
   if(settingsConfig.ACONP){
-    if(apigetConnectionInfo()){
-      if(currentCon.state != "Operational"){
-        //Serial.println("Printer connection is not Operational");
+    apigetConnectionInfo();
+    #ifdef _debugopra
+      Serial.println("AutoConnect: true");
+      Serial.print("Current State:");Serial.println(currentCon.state);
+      Serial.print("Current Printer State:");Serial.println(api.printerStats.printerState);
+      
+    #endif
+    
+    if(currentCon.state != "Operational"){
+      #ifdef _debugopra
+      Serial.println("Checking to see if a connection should be tried.");
+      #endif
+      
+      if(currentCon.state != "Opening serial connection" && currentCon.state != "Connection request sent"){
         #ifdef _debugopra
-        Serial.println(currentCon.state);
+          Serial.println("tring to connect.");
         #endif
-        if(currentCon.state != "Opening serial connection" || currentCon.state != "Connecton request sent"){
-          //Try to reconnect to settingsConfig.PProfile
-          String command = "{\"command\":\"connect\",\"autoconnect\": true,\"printerProfile\": \""+ String(settingsConfig.PProfile) + "\",\"port\":\"COM10\"}";
-          api.sendPostToOctoPrint("/api/connection",command.c_str());
-          currentCon.state = "Connecton request sent"; //Set this so that we dont spam Ocoprint with connection commands. It will update with the next status request.
-          //should set check interval to maybe 1 sec. for a few iterations. 
-        }
+        //Try to reconnect to settingsConfig.PProfile
+        String command = "{\"command\":\"connect\",\"autoconnect\": true,\"printerProfile\": \""+ String(settingsConfig.PProfile) + "\"}";
+        api.sendPostToOctoPrint("/api/connection",command.c_str());
+        currentCon.state = "Connection request sent"; //Set this so that we dont spam Ocoprint with connection commands. It will update with the next status request.
+        //should set check interval to maybe 1 sec. for a few iterations. 
+      }else{
+        #ifdef _debugopra
+          Serial.println("No need to try to connect.");
+        #endif
       }
     }
   }
@@ -255,8 +281,29 @@ void PrintNetStat(){
 void CheckSerialCommands(){
   if (Serial.available())
   {
-    String command = Serial.readStringUntil(' ');
-    String value = Serial.readString();
+    String buf = Serial.readStringUntil('\n');
+    buf.trim();
+    #ifdef _debugopra
+    Serial.print("buf:");Serial.println(buf);
+    #endif
+    
+    int sepPos = buf.indexOf(" ");
+    String command ="";
+    String value = "";
+    
+    if(sepPos){
+      command = buf.substring(0,sepPos);
+      value = buf.substring(sepPos+1);;
+      #ifdef _debugopra
+        Serial.print("command:");Serial.print("[");Serial.print(command);Serial.println("]");
+        Serial.print("value:");Serial.print("[");Serial.print(value);Serial.println("]");
+      #endif
+    }else{
+      command = buf;
+      #ifdef _debugopra
+        Serial.print("command:");Serial.print("[");Serial.print(command);Serial.println("]");
+      #endif
+    }
     
     if (command == "help"){
       Serial.println("Avalible commands: (all commands should end with a space when there are no parameters)");
@@ -426,7 +473,7 @@ bool apigetPrintStats(){
 bool apigetConnectionInfo(){
   if(PollConnectionInfo.check()){
     #ifdef _debugopra
-    Serial.println("Printer Connection info updated");
+    Serial.println("Printer Connection info updated>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
     #endif
     PollConnectionInfo.set(PollConnectionInfoInterval);
     return getPrinterConnectionInfo();
@@ -470,10 +517,10 @@ AxisInfo axisInfo;
 bool getAxisPostionInfo(){
   
   if(PollAxisInfo.check()){
-    String response = api.getOctoprintEndpointResults("plugin/helloworld");
+    String response = api.getOctoprintEndpointResults(OCTOPENDENT_API_URL);
     StaticJsonDocument<512> root;
     
-    bool error = deserializeJson(root, response);
+    DeserializationError  error = deserializeJson(root, response);
     if (!error) {
       axisInfo.X = root["Axis"]["X"];
       axisInfo.Y = root["Axis"]["Y"];
@@ -505,8 +552,9 @@ bool getAxisPostionInfo(){
 bool getPrinterConnectionInfo(){
   //call generic endpoint method...
   String response = api.getOctoprintEndpointResults("connection");
-  StaticJsonDocument<1024> root;
-  if (!deserializeJson(root, response)) {
+  StaticJsonDocument<2048> root; //seems to be pretty large for a PC based solution. 
+  DeserializationError  error = deserializeJson(root, response);
+  if (!error) {
     currentCon.state = (const char *)root["current"]["state"]; // "Opening serial connection","Operational","Closed"
     currentCon.profileId = (const char *)root["current"]["printerProfile"]; //"_default" is if no profile is selected. It maybe the only profile in the system. 
     currentCon.port = (const char *)root["current"]["port"];
@@ -525,8 +573,15 @@ bool getPrinterConnectionInfo(){
     
     return true;
   }else{
+    
+    Serial.print("deserializeJson() failed: ");
+    Serial.println(error.c_str());
+
     #ifdef _debugopra
     Serial.println("Error getting Printer Serial Conneciton details.");
+    Serial.println("Response object:");
+    Serial.println(response);
+    
     Serial.print("Status Code:");
     Serial.println(api.httpStatusCode);
     Serial.println("Response Body:");
