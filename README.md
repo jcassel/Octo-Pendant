@@ -61,6 +61,14 @@ To upload the files manually, (my preferred method) do the following.
 	* control1.bmp
 	* Level.bmp
 	* Temps.bmp
+ * Next you should load up the json region files. These tell the systen where to look for touch screen events. They are also adjustable if you find you want to move things or adjust the touch regions.
+ 	* tmpscrn.json
+  	* lvlscrn.json
+   	* infoscrn.json
+	* hscrn.json
+ 	* fSrgn.json
+  	* ctlscrn.json
+   	* ctlmnuscrn.json
 
 * Now that everything is loaded, you can use the menu in the web interface to go to the Configuration screen. (First menu item at the top of the web page) 
 * on this screen, much of it should be self-explanatory but I will go through it in detail. 
