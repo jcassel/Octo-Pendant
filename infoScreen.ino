@@ -7,6 +7,7 @@ ActionRegion infoScrnARgn[infoScrnRgnSize];
 #define nameRgn   1
 #define ipRgn     2
 #define resetRgn  3
+#define fwRgn     4
 
 
 TimeRelease resetEnableDelay;
@@ -79,6 +80,13 @@ void setInfoScreenText(){
   infoScrnARgn[ipRgn].region.w = tft.drawString(leadDisplayString,infoScrnARgn[ipRgn].region.x,infoScrnARgn[ipRgn].region.y); //return is the new length of the displayed text.
   tft.setTextColor(TFT_YELLOW);     // Set the font colour
   infoScrnARgn[ipRgn].region.w += tft.drawString(displayString,infoScrnARgn[ipRgn].region.x + infoScrnARgn[ipRgn].region.w,infoScrnARgn[ipRgn].region.y); //return is the new length of the displayed text.
+
+  leadDisplayString = "FW: ";displayString = CONFIG_VERSION;
+  tft.setTextColor(TFT_WHITE);     // Set the font colour
+  infoScrnARgn[fwRgn].region.w = tft.drawString(leadDisplayString,infoScrnARgn[fwRgn].region.x,infoScrnARgn[fwRgn].region.y); //return is the new length of the displayed text.
+  tft.setTextColor(TFT_YELLOW);     // Set the font colour
+  infoScrnARgn[fwRgn].region.w += tft.drawString(displayString,infoScrnARgn[fwRgn].region.x + infoScrnARgn[fwRgn].region.w,infoScrnARgn[fwRgn].region.y); //return is the new length of the displayed text
+  
   
   leadDisplayString = "Reset Pendant";displayString = "";
   //tft.setTextColor(TFT_WHITE);     // Set the font colour
@@ -149,6 +157,13 @@ bool loadInfoScreenRgns(){
     tmpRgn = getRegionFromString(tmpSRgn);
     infoScrnARgn[resetRgn].TextRgn = false;
     infoScrnARgn[resetRgn].init(tmpRgn);    
+
+    //Firmware Version
+    strlcpy(tmpSRgn, doc["FW"] | "005140150020", 13);
+    tmpRgn = getRegionFromString(tmpSRgn);
+    infoScrnARgn[fwRgn].TextRgn = false;
+    infoScrnARgn[fwRgn].init(tmpRgn);    
+
     
         
     #ifdef _debugopra    
@@ -191,6 +206,8 @@ void initInfoScreen(){
       //IP Address
     }else if(rgn == 3){//3 reboot/reset
       infoScrnARgn[rgn].setReleaseAction(infoScrnARgn_Rst);
+    }else if(rgn == 4){//4 firmware version
+      //Firmware
     }
     #ifdef _debugopra
     infoScrnARgn[rgn].drawRegion(&tft,TFT_YELLOW); // turn this on to debug visually the regions. draws a box around the button 
