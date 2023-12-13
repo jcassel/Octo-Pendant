@@ -49,7 +49,7 @@ To upload the files manually, (my preferred method) do the following.
 	http://192.168.4.1/spiffs
 	You will need to put in the username and password again. 
 	
-* On this screen you can select files to upload to the device. Best results are if you upload everything in the /data folder in the following order. Note: there are 10 files.
+* On this screen you can select files to upload to the device. Best results are if you upload everything in the /data folder in the following order. Note: there are 11 files.
 	* style.css
 	* scripts.js
 	* spiffs.htm (After this the web interface will become a little better)
@@ -57,10 +57,24 @@ To upload the files manually, (my preferred method) do the following.
 	* ota.htm
 	* mansettings.js
 	* mansettings.htm
-	* Home.bmp
-	* control1.bmp
+	* Control1.bmp
+  	* ControlMenu.bmp	
+   	* Home.bmp
 	* Level.bmp
 	* Temps.bmp
+
+ * Next you should load up the json region files. These tell the systen where to look for touch screen events. They are also adjustable if you find you want to move things or adjust the touch regions.
+   	* ctlmnuscrn.json
+	* ctlscrn.json
+	* fSrgn.json
+	* hscrn.json
+	* infoscrn.json
+    	* lvlscrn.json
+   	* tmpscrn.json
+
+ 	
+  	
+ 
 
 * Now that everything is loaded, you can use the menu in the web interface to go to the Configuration screen. (First menu item at the top of the web page) 
 * on this screen, much of it should be self-explanatory but I will go through it in detail. 
