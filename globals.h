@@ -4,7 +4,7 @@
 //#define _debugopra // uncomment for general serial messages for core logic will also add regions for screen debugging.
 //#define _debugTouch //uncomment to show touch cordenents live. 
 
-#define CONFIG_VERSION "OctoPendant 1.0.1.6"
+#define CONFIG_VERSION "OctoPendant 1.0.1.7"
 #define DEFAULT_HOSTS_NAME "OctoPendant-New"
 #define OCTOPENDENT_API_URL "plugin/OctoPendant"
 
