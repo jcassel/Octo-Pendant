@@ -574,11 +574,11 @@ bool getPrinterConnectionInfo(){
     return true;
   }else{
     
-    Serial.print("deserializeJson() failed: ");
+    Serial.print("deserializeJson() failed: getPrinterConnectionInfo()");
     Serial.println(error.c_str());
-
-    #ifdef _debugopra
-    Serial.println("Error getting Printer Serial Conneciton details.");
+    
+    
+    Serial.println("Error getting Printer Serial Conneciton details.\nLikely the response is too large for the buffer.\nMaybe there are too many ports listed.\nUse the black list in OctoPrint's Serial Settings to remove all ports that do not matter.");
     Serial.println("Response object:");
     Serial.println(response);
     
@@ -586,7 +586,7 @@ bool getPrinterConnectionInfo(){
     Serial.println(api.httpStatusCode);
     Serial.println("Response Body:");
     Serial.println(api.httpErrorBody);
-    #endif 
+    
   }
   return false;
 }
