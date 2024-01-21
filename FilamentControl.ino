@@ -98,7 +98,11 @@ void filCtlARgn_Ulb(){ //unload button Up Arrow
   #ifdef _debugopra
   Serial.println("filCtlARgn_Ulb");
   #endif
+  Serial.print("Retracting Filament: ");Serial.print(unloadLen);Serial.println("mm");
+  String commands = "{\"commands\": [\"G91\",\"M83\",\"G1 E-"+ String(unloadLen) +" F300\",\"M82\",\"M90\"]}"; 
+  api.sendPostToOctoPrint("/api/printer/command",commands.c_str());
   setfilCtlScreenText();
+  
 }
 
 void filCtlARgn_Ul1(){ 
@@ -137,7 +141,9 @@ void filCtlARgn_Lb(){ //load button Down arrow
   #ifdef _debugopra
   Serial.println("filCtlARgn_Lb");
   #endif
-  
+  Serial.print("Extruding Filament: ");Serial.print(unloadLen);Serial.println("mm");
+  String commands = "{\"commands\": [\"G91\",\"M83\",\"G1 E"+ String(unloadLen) +" F300\",\"M82\",\"M90\"]}"; 
+  api.sendPostToOctoPrint("/api/printer/command",commands.c_str());
 }
 
 
