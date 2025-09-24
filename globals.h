@@ -4,7 +4,9 @@
 //#define _debugopra // uncomment for general serial messages for core logic will also add regions for screen debugging.
 //#define _debugTouch //uncomment to show touch cordenents live. 
 
-#define CONFIG_VERSION "OctoPendant 1.0.1.8"
+bool basicDebug = false;
+
+#define CONFIG_VERSION "OctoPendant 1.0.1.9"
 #define DEFAULT_HOSTS_NAME "OctoPendant-New"
 #define OCTOPENDENT_API_URL "plugin/OctoPendant"
 
@@ -48,7 +50,7 @@ struct SettingsConfig
   char unique_Id[33];
   char OPURI[128]; //octoprint URL/URI Ip or fcdn
   int OPPort; //Octoprint port
-  char OPAK[34]; //octoprint API Key 32 char
+  char OPAK[64]; //octoprint API Key 32 char
   char OPLGCF[64]; //may want to adjust this if you have your lvel file deep in the OctoPrint file system.
   int OPReload; //should it reload the last object after mesh value gathering. 
   int OPStart; //Should it start the next print after mesh value gathering.

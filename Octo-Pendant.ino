@@ -1,3 +1,10 @@
+#include <Boards.h>
+#include <Firmata.h>
+#include <FirmataConstants.h>
+#include <FirmataDefines.h>
+#include <FirmataMarshaller.h>
+#include <FirmataParser.h>
+
 #include <ArduinoJson.h> 
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
@@ -21,7 +28,7 @@
 #include <TimeLib.h>
 
 void setup() {
-  Serial.begin(74880);
+  Serial.begin(115200);
   #ifdef _debugopra
   Serial.println("Begin Setup");
   
@@ -64,7 +71,14 @@ void setup() {
     mqttStatusInerval.set(mqttConfig.StatusIntervalSec * 1000);
   }
   Serial.println("end MQTT");
-  api.init(net, settingsConfig.OPURI, settingsConfig.OPPort, settingsConfig.OPAK);
+  
+  IPAddress PrinterIp;
+  if(PrinterIp.fromString(settingsConfig.OPURI)){
+    api.init(net, PrinterIp, settingsConfig.OPPort, settingsConfig.OPAK);
+  }else{
+    api.init(net, settingsConfig.OPURI, settingsConfig.OPPort, settingsConfig.OPAK);
+  }
+  
   Serial.println("end OctoprintAPI");
   tft.init();
   Serial.println("end TFT init");
@@ -119,32 +133,48 @@ void loop() {
       }
     }
   }
-
-  webServer.handleClient();
-  doPrinterAutoConnect();
-  CheckSerialCommands();
   
+  if (basicDebug){Serial.print("handle Client");}
+  webServer.handleClient();
+  if (basicDebug){Serial.println("..");}
+  if (basicDebug){Serial.print("Auto Connect");}
+  doPrinterAutoConnect();
+  if (basicDebug){Serial.println("..");}
+  if (basicDebug){Serial.print("check Serial commands");}
+  CheckSerialCommands();
+  if (basicDebug){Serial.println("..");}
+  if (basicDebug){Serial.print("check Touch");}
   CheckTouch();
-
+  if (basicDebug){Serial.println("..");}
+  
   if(UpdateCurrentScreen.check()){
+    if (basicDebug){Serial.print("update current screen");}
     ProcessScreenData();
+    if (basicDebug){Serial.print(".");}
     UpdateCurrentScreen.set(UpdateCurrentScreenPollInterval); //set interval for next update of screen.
+    if (basicDebug){Serial.println(".");}
   }
   
+  
   if(doWiFiScan){
+    if (basicDebug){Serial.print("WifiScann");}
     doWiFiScan = false;
     int n = WiFi.scanNetworks();
     storeWifiScanResult(n);
+    if (basicDebug){Serial.println("..");}
   }
   
+  if (basicDebug){Serial.print("Is OctoPrint Online");}
   isOctoPrintOnline(); //not really doing much but will populate the version info struct
+  if (basicDebug){Serial.println("..");}
 
+  makeWebRequest();
   
 } //end loop
 
 void doPrinterAutoConnect(){
   #ifdef _debugopra
-    Serial.println("Check AutoConnect");
+    //Serial.println("Check AutoConnect");
   #endif
   
   if(settingsConfig.ACONP){
@@ -235,24 +265,40 @@ bool CheckTouch(){
 void ProcessScreenData(){
   
   if(currentScreen ==0){
+    if (basicDebug){Serial.print(":setHomeText");}
     setHomeText(false);
+    if (basicDebug){Serial.print(".");}
   } else if (currentScreen == 1){
+    if (basicDebug){Serial.print(":setControlScreenText");}
     setControlScreenText(); 
+    if (basicDebug){Serial.print(".");}
   }else if (currentScreen == 2){
+    if (basicDebug){Serial.print(":setTemperatureScreenText");}
     setTemperatureScreenText();
+    if (basicDebug){Serial.print(".");}
   }else if (currentScreen == 3){
+    if (basicDebug){Serial.print(":setLevelScreenText");}
     setLevelScreenText();
+    if (basicDebug){Serial.print(".");}
   }else if (currentScreen == 4){
+    if (basicDebug){Serial.print(":setInfoScreenText");}
     setInfoScreenText();
+    if (basicDebug){Serial.print(".");}
   }else if (currentScreen == 5){
+    if (basicDebug){Serial.print(":setCtlMnuScreenText");}
     setCtlMnuScreenText();
+    if (basicDebug){Serial.print(".");}
   }else if (currentScreen == 6){
+    if (basicDebug){Serial.print(":setfilCtlScreenText");}
     setfilCtlScreenText();
+    if (basicDebug){Serial.print(".");}
   }
+  if (basicDebug){Serial.println(".");}
 
+  if (basicDebug){Serial.print("check on mesh collection");}
   //checkon background Processes
   checkRunningMeshCollection(); //dont care what screen you are on.. This needs to continue to work after you leave the screen.
-  
+  if (basicDebug){Serial.println("..");}
 }
 
 
@@ -309,7 +355,7 @@ void CheckSerialCommands(){
       Serial.println("Avalible commands: (all commands should end with a space when there are no parameters)");
       Serial.println("setssid [param]; sets the wifi SSID to the param value");
       Serial.println("setpassword [param]; sets the wifi password to the param value");
-      Serial.println("setwifimode [param]; sets the wifi Mode for next startup to the param value");
+      Serial.println("setwifimode [param]; sets the wifi Mode for next startup to the param value; ('WIFI_AP' is Accesspoint) or ('WIFI_STA' is Station)");
       Serial.println("sethostname [param]; sets the wifi password to the param value");
       Serial.println("setappassword [param]; sets the wifi password to the param value");
       Serial.println("setattempts [param]; sets the wifi password to the param value");
@@ -321,6 +367,7 @@ void CheckSerialCommands(){
       Serial.println("settooltemp [param]; sends command to Octoprint to set hot end temperature to param value (number in deg c)");
       Serial.println("setbedtemp [param]; sends command to Octoprint to set Bed temperature to param value (number in deg c)");
       Serial.println("setpoll [param]; sets interval to poll the Octoprint instance for status (number in ms) ");
+      Serial.println("debug [param]; sets debug flag to true/on. you much reset device to clear");
       #ifdef _debugopra
       Serial.println("font [param]; Sets font number for system display [experemental could be fatal]");
       Serial.println("getsrgn [param]; gets the current screens region info for the supplied param(number)");
@@ -342,7 +389,7 @@ void CheckSerialCommands(){
     else if (command == "setbedtemp"){api.octoPrintSetBedTemperature(value.toInt());}
     else if (command == "setpoll"){UpdateCurrentScreenPollInterval = value.toInt();}
     else if (command == "spiffstat"){Serial.print("Space Left Bytes:");Serial.println(SpaceLeft());}
-    
+    else if (command == "debug"){Serial.println("debug on, reset device to turn off");basicDebug = true;}
   }
 }
 
@@ -598,4 +645,8 @@ bool isOctoPrintOnline(){
     PollOPOnline.set(PollOPOnlineInterval);
   }
   return OctoPrintOnline;
+}
+
+bool makeWebRequest(){
+  
 }
